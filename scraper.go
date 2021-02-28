@@ -1,6 +1,7 @@
 package openldap_exporter
 
 import (
+	"crypto/tls"
 	"fmt"
 	"log"
 	"strconv"
@@ -130,6 +131,12 @@ func (s *Scraper) runOnce() {
 
 func (s *Scraper) scrape() error {
 	l, err := ldap.Dial(s.Net, s.Addr)
+        // Reconnect with TLS
+	err = l.StartTLS(&tls.Config{InsecureSkipVerify: true})
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	if err != nil {
 		return fmt.Errorf("dial failed: %w", err)
 	}
