@@ -131,17 +131,15 @@ func (s *Scraper) runOnce() {
 
 func (s *Scraper) scrape() error {
 	l, err := ldap.Dial(s.Net, s.Addr)
-        // Reconnect with TLS
-	err = l.StartTLS(&tls.Config{InsecureSkipVerify: true})
-	if err != nil {
-		log.Fatal(err)
-	}
-
 	if err != nil {
 		return fmt.Errorf("dial failed: %w", err)
 	}
 	defer l.Close()
-
+	// Reconnect with TLS
+	err = l.StartTLS(&tls.Config{InsecureSkipVerify: true})
+	if err != nil {
+		log.Fatal(err)
+	}
 	if s.User != "" && s.Pass != "" {
 		err = l.Bind(s.User, s.Pass)
 		if err != nil {

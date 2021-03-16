@@ -19,8 +19,7 @@ format:
 	@echo "Running goimports ..."
 	@goimports -w -local github.com/tomcz/openldap_exporter $(shell find . -type f -name '*.go' | grep -v '/vendor/')
 
-compile = GOOS=$1 GOARCH=amd64 go build -ldflags "${LDFLAGS}" -o target/openldap_exporter-$1 ./cmd/openldap_exporter
+compile = GOOS=$1 GOARCH=arm64 go build -ldflags "${LDFLAGS}" -o target/openldap_exporter-$1 ./cmd/openldap_exporter
 
 build: target
 	$(call compile,linux)
-	$(call compile,darwin)
