@@ -59,6 +59,15 @@ var (
 		},
 		[]string{"dn"},
 	)
+	upGauge = prometheus.NewGaugeVec(
+		prometheus.GaugeOpts{
+			Subsystem: "openldap",
+			Name:      "up",
+			Help:      help(opsBaseDN, objectClass(monitorOperation), monitorOpCompleted),
+		},
+		[]string{"up"},
+	)
+
 	scrapeCounter = prometheus.NewCounterVec(
 		prometheus.CounterOpts{
 			Subsystem: "openldap",
@@ -94,6 +103,8 @@ func init() {
 		monitoredObjectGauge,
 		monitorCounterObjectGauge,
 		monitorOperationGauge,
+		upGauge,
+
 		scrapeCounter,
 	)
 }
@@ -123,9 +134,11 @@ func (s *Scraper) Start() {
 func (s *Scraper) runOnce() {
 	if err := s.scrape(); err != nil {
 		scrapeCounter.WithLabelValues("fail").Inc()
+		upGauge.WithLabelValues("0").Set(0)
 		log.Println("scrape failed, error is:", err)
 	} else {
 		scrapeCounter.WithLabelValues("ok").Inc()
+		upGauge.WithLabelValues("1").Set(1)
 	}
 }
 
